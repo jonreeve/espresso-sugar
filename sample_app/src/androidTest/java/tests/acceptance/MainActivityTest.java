@@ -2,6 +2,7 @@ package tests.acceptance;
 
 import android.support.test.runner.AndroidJUnit4;
 import com.espresso.sugar.ActivityTest;
+import com.espresso.sugar.ViewWaitCondition;
 import com.espresso.sugar.WaitCondition;
 import com.espresso.sugar.sample.MainActivity;
 import com.espresso.sugar.sample.R;
@@ -31,7 +32,10 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
 
         pressAndHoldView(withId(R.id.image)).andDrop();
         WaitCondition condition = null;
+        ViewWaitCondition viewCondition = null;
         pressAndHoldView(withId(R.id.image)).until(condition).then();//.drag()...;
+        pressAndHoldView(withId(R.id.image)).untilIt(viewCondition).then();//.drag()...;
+        pressAndHoldView(withId(R.id.image)).untilView(withId(R.id.image), viewCondition).then();//.drag()...;
 
 //        View v;
 //        v.animate().alpha();

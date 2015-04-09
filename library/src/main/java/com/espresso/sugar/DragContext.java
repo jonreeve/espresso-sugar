@@ -37,6 +37,10 @@ public class DragContext {
     }
 
     public void perform(ViewAction viewAction) {
+        perform(viewMatcher, viewAction);
+    }
+
+    public void perform(Matcher<View> viewMatcher, ViewAction viewAction) {
         Espresso.onView(viewMatcher).perform(viewAction);
     }
 }

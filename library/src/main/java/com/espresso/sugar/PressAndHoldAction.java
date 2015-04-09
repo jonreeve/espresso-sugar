@@ -6,11 +6,11 @@ import android.support.test.espresso.action.*;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.view.MotionEvent;
 import android.view.View;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 
 import javax.annotation.Nonnull;
+
+import static org.hamcrest.Matchers.anything;
 
 public class PressAndHoldAction {
     @Nonnull private final DragContext dragContext;
@@ -57,26 +57,16 @@ public class PressAndHoldAction {
         return this;
     }
 
-    public PressAndHoldAction until(final WaitCondition condition) {
+    public PressAndHoldAction until(@Nonnull final WaitCondition condition) {
         dragContext.perform(new ViewAction() {
             @Override
             public Matcher<View> getConstraints() {
-                return new BaseMatcher<View>() {
-                    @Override
-                    public boolean matches(Object o) {
-                        return true;
-                    }
-
-                    @Override
-                    public void describeTo(Description description) {
-                        description.appendText("anything");
-                    }
-                };
+                return anything();
             }
 
             @Override
             public String getDescription() {
-                return "until" + condition.getDescription();
+                return "until " + condition.getDescription();
             }
 
             @Override
@@ -88,6 +78,33 @@ public class PressAndHoldAction {
         });
         return this;
     }
+
+    public PressAndHoldAction untilView(@Nonnull final Matcher<View> viewMatcher, @Nonnull final ViewWaitCondition condition) {
+        dragContext.perform(viewMatcher, new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return anything();
+            }
+
+            @Override
+            public String getDescription() {
+                return "until " + condition.getDescription(dragContext.getViewMatcher());
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                while (!condition.isSatisfied(view)) {
+                    uiController.loopMainThreadForAtLeast(50);
+                }
+            }
+        });
+        return this;
+    }
+
+    public PressAndHoldAction untilIt(@Nonnull final ViewWaitCondition condition) {
+        return untilView(dragContext.getViewMatcher(), condition);
+    }
+
 
     public PressAndHoldAction then() {
         // TODO implement com.wasabicode.test.espresso.sugar.PressAndHoldAction#then
