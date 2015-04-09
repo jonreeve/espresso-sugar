@@ -33,30 +33,6 @@ public class PressAndHoldAction {
         this.dragContext = dragContext;
     }
 
-    private PressAndHoldAction perform() {
-        dragContext.perform(new ViewAction() {
-            @Override
-            public Matcher<View> getConstraints() {
-                return ViewMatchers.isDisplayingAtLeast(90);
-            }
-
-            @Override
-            public String getDescription() {
-                return "drag";
-            }
-
-            @Override
-            public void perform(UiController uiController, View view) {
-                float[] coordinates = coordinatesProvider.calculateCoordinates(view);
-                float[] precision = precisionDescriber.describePrecision();
-
-                MotionEvent downEvent = MotionEvents2.sendDown(uiController, coordinates, precision).down;
-                dragContext.setDownEvent(downEvent);
-            }
-        });
-        return this;
-    }
-
     public PressAndHoldAction until(@Nonnull final WaitCondition condition) {
         dragContext.perform(new ViewAction() {
             @Override
@@ -111,7 +87,35 @@ public class PressAndHoldAction {
         return this;
     }
 
-    public DropAction andDrop() {
-        return new DropAction(dragContext);
+    public DragContinuation drag() {
+        return new DragContinuation(dragContext);
+    }
+
+    public void andDrop() {
+        new DropAction(dragContext);
+    }
+
+    private PressAndHoldAction perform() {
+        dragContext.perform(new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return ViewMatchers.isDisplayingAtLeast(90);
+            }
+
+            @Override
+            public String getDescription() {
+                return "drag";
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                float[] coordinates = coordinatesProvider.calculateCoordinates(view);
+                float[] precision = precisionDescriber.describePrecision();
+
+                MotionEvent downEvent = MotionEvents2.sendDown(uiController, coordinates, precision).down;
+                dragContext.setDownEvent(downEvent);
+            }
+        });
+        return this;
     }
 }

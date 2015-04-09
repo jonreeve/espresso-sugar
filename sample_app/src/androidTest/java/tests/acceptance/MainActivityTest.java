@@ -1,11 +1,13 @@
 package tests.acceptance;
 
 import android.support.test.runner.AndroidJUnit4;
+import android.view.View;
 import com.espresso.sugar.ActivityTest;
 import com.espresso.sugar.ViewWaitCondition;
 import com.espresso.sugar.WaitCondition;
 import com.espresso.sugar.sample.MainActivity;
 import com.espresso.sugar.sample.R;
+import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -31,11 +33,32 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
         scrollToView(withId(R.id.image));
 
         pressAndHoldView(withId(R.id.image)).andDrop();
-        WaitCondition condition = null;
-        ViewWaitCondition viewCondition = null;
-        pressAndHoldView(withId(R.id.image)).until(condition).then();//.drag()...;
-        pressAndHoldView(withId(R.id.image)).untilIt(viewCondition).then();//.drag()...;
-        pressAndHoldView(withId(R.id.image)).untilView(withId(R.id.image), viewCondition).then();//.drag()...;
+        WaitCondition condition = new WaitCondition() {
+            @Override
+            public boolean isSatisfied() {
+                return true;
+            }
+
+            @Override
+            public String getDescription() {
+                return "(true)";
+            }
+        };
+        ViewWaitCondition viewCondition = new ViewWaitCondition() {
+            @Override
+            public boolean isSatisfied(View view) {
+                return view.getVisibility() == View.VISIBLE;
+            }
+
+            @Override
+            public String getDescription(Matcher<View> viewMatcher) {
+                return "is visible";
+            }
+        };
+        pressAndHoldView(withId(R.id.image)).until(condition).then().drag();
+        pressAndHoldView(withId(R.id.image)).untilIt(viewCondition).then().drag();
+        pressAndHoldView(withId(R.id.image)).untilView(withId(R.id.image), viewCondition).then().drag();
+        pressAndHoldView(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andDrop();
 
 //        View v;
 //        v.animate().alpha();
