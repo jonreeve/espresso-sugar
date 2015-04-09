@@ -2,6 +2,7 @@ package tests.acceptance;
 
 import android.support.test.runner.AndroidJUnit4;
 import com.espresso.sugar.ActivityTest;
+import com.espresso.sugar.WaitCondition;
 import com.espresso.sugar.sample.MainActivity;
 import com.espresso.sugar.sample.R;
 import org.junit.Test;
@@ -29,12 +30,12 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
         scrollToView(withId(R.id.image));
 
         pressAndHoldView(withId(R.id.image)).andDrop();
+        WaitCondition condition = null;
+        pressAndHoldView(withId(R.id.image)).until(condition).then();//.drag()...;
 
 //        View v;
 //        v.animate().alpha();
 
-        pressAndHoldView(withId(R.id.image)).andDrop();
-//        pressAndHoldView(withId(R.id.image)).until(condition).then().drag()...;
 
         // TODO clever scrolls to find things, that actually do what a user would
 
