@@ -1,0 +1,20 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:id="@+id/container"
+             android:orientation="vertical"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context=".ViewItemActivity"
+             tools:ignore="MergeRootFrame">
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button1_text"
+            android:id="@+id/button"
+            />
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText"
+            />
+</LinearLayout>
