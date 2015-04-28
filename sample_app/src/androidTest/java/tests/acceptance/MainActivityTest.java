@@ -45,4 +45,53 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
 
         mockery.assertIsSatisfied();
     }
+
+//        type("Hello").intoView(withId(R.id.editText1));
+//        type(R.string.app_name).intoView(withId(R.id.editText1));
+//        scrollToView(withId(R.id.image));
+//
+//        pressAndHoldView(withId(R.id.image)).andDrop();
+//        WaitCondition condition = new WaitCondition() {
+//            @Override
+//            public boolean isSatisfied() {
+//                return true;
+//            }
+//
+//            @Override
+//            public String getDescription() {
+//                return "(true)";
+//            }
+//        };
+//        ViewWaitCondition viewCondition = new ViewWaitCondition() {
+//            @Override
+//            public boolean isSatisfied(View view) {
+//                return view.getVisibility() == View.VISIBLE;
+//            }
+//
+//            @Override
+//            public String getDescription(Matcher<View> viewMatcher) {
+//                return "is visible";
+//            }
+//        };
+//        pressAndHoldView(withId(R.id.image)).until(condition).then().drag();
+//        pressAndHoldView(withId(R.id.image)).untilIt(viewCondition).then().drag();
+//        pressAndHoldView(withId(R.id.image)).untilView(withId(R.id.image), viewCondition).then().drag();
+//        pressAndHoldView(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andDrop();
+
+//        View v;
+//        v.animate().alpha();
+
+
+// TODO clever scrolls to find things, that actually do what a user would
+
+// Later
+//        dragView(withId(R.id.image)).overView(withId(R.id.image)).andDrop();
+//        pressAndHoldView(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andDrop();
+//        pressAndHoldView(withId(R.id.image)).thenAfter(10, SECONDS).drag()...;
+//        pressAndHoldView(withId(R.id.image)).until(XXX).then().drag()...;
+//        pressAndHoldView(withId(R.id.image)).until(XXX).thenAfter(10, SECONDS).drag()...;
+//        pressAndHoldView(withId(R.id.image)).untilIt(turnsGreen()).thenAfter(10, SECONDS).drag()...;
+//        pressAndHoldView(withId(R.id.image)).untilView(withText("Test"), turnsGreen()).thenAfter(10, SECONDS).drag()...;
+//        pressAndHoldView(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andHold(); // Terminate in the same way the animation framework does? Then drop or error? Configurable?
+//        pressAndHoldView(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andHold().untilIt(); // "It" should be the view you're dragging, always - consistent, simple, other one not always present
 }
