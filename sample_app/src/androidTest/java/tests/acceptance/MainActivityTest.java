@@ -1,6 +1,7 @@
 package tests.acceptance;
 
 import android.support.test.runner.AndroidJUnit4;
+import android.view.KeyEvent;
 import com.espresso.sugar.ActivityTest;
 import com.espresso.sugar.sample.MainActivity;
 import com.espresso.sugar.sample.R;
@@ -11,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static com.espresso.sugar.EspressoSugar.*;
@@ -38,10 +40,35 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
         }});
 
         // Raw Espresso looks like this, yuk.
-        //onView(withText(R.string.button1)).perform(click());
+        // onView(withText(R.string.button1)).perform(click());
 
         // Much better :)
         clickView(withText(R.string.button1_text));
+
+        mockery.assertIsSatisfied();
+    }
+
+    @Test
+    public void canTypeIntoAView() {
+        mockery.checking(new Expectations() {
+            {
+                keyPress(KeyEvent.KEYCODE_T);
+                keyPress(KeyEvent.KEYCODE_E);
+                keyPress(KeyEvent.KEYCODE_S);
+                keyPress(KeyEvent.KEYCODE_T);
+            }
+
+            private void keyPress(int keycode) {
+                oneOf(uiInteractionListener).onKey(with(withId(R.id.editText1)), with(keycode), with(any(KeyEvent.class)));
+                oneOf(uiInteractionListener).onKey(with(withId(R.id.editText1)), with(keycode), with(any(KeyEvent.class)));
+            }
+        });
+
+        // Raw Espresso version
+        // onView(withId(R.id.editText1)).perform(type("test"));
+
+        // Our version
+        type("test").intoView(withId(R.id.editText1));
 
         mockery.assertIsSatisfied();
     }
