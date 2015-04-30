@@ -20,7 +20,6 @@ public class TypeResourceStringAction {
 
     public void intoView(Matcher<View> viewMatcher) {
         Espresso.onView(viewMatcher).perform(new TypeResourceTextAction());
-
     }
 
     private class TypeResourceTextAction implements ViewAction {

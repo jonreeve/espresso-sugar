@@ -39,10 +39,10 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
             oneOf(uiInteractionListener).onClick(with(withId(R.id.button1)));
         }});
 
-        // Raw Espresso looks like this, yuk.
+        // Espresso
         // onView(withText(R.string.button1)).perform(click());
 
-        // Much better :)
+        // Sugared
         clickView(withText(R.string.button1_text));
 
         mockery.assertIsSatisfied();
@@ -50,30 +50,25 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
 
     @Test
     public void canTypeIntoAView() {
-        mockery.checking(new Expectations() {
-            {
-                keyPress(KeyEvent.KEYCODE_T);
-                keyPress(KeyEvent.KEYCODE_E);
-                keyPress(KeyEvent.KEYCODE_S);
-                keyPress(KeyEvent.KEYCODE_T);
-            }
+        expectTypingTest();
 
-            private void keyPress(int keycode) {
-                oneOf(uiInteractionListener).onKey(with(withId(R.id.editText1)), with(keycode), with(any(KeyEvent.class)));
-                oneOf(uiInteractionListener).onKey(with(withId(R.id.editText1)), with(keycode), with(any(KeyEvent.class)));
-            }
-        });
-
-        // Raw Espresso version
+        // Espresso
         // onView(withId(R.id.editText1)).perform(type("test"));
 
-        // Our version
+        // Sugared
         type("test").intoView(withId(R.id.editText1));
 
         mockery.assertIsSatisfied();
     }
 
-//        type("Hello").intoView(withId(R.id.editText1));
+    @Test
+    public void canTypeResourceStringIntoAView() {
+        expectTypingTest();
+
+        type(R.string.test).intoView(withId(R.id.editText1));
+    }
+
+
 //        type(R.string.app_name).intoView(withId(R.id.editText1));
 //        scrollToView(withId(R.id.image));
 //
@@ -121,4 +116,20 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
 //        pressAndHoldView(withId(R.id.image)).untilView(withText("Test"), turnsGreen()).thenAfter(10, SECONDS).drag()...;
 //        pressAndHoldView(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andHold(); // Terminate in the same way the animation framework does? Then drop or error? Configurable?
 //        pressAndHoldView(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andHold().untilIt(); // "It" should be the view you're dragging, always - consistent, simple, other one not always present
+
+    private void expectTypingTest() {
+        mockery.checking(new Expectations() {
+            {
+                keyPress(KeyEvent.KEYCODE_T);
+                keyPress(KeyEvent.KEYCODE_E);
+                keyPress(KeyEvent.KEYCODE_S);
+                keyPress(KeyEvent.KEYCODE_T);
+            }
+
+            private void keyPress(int keycode) {
+                oneOf(uiInteractionListener).onKey(with(withId(R.id.editText1)), with(keycode), with(any(KeyEvent.class)));
+                oneOf(uiInteractionListener).onKey(with(withId(R.id.editText1)), with(keycode), with(any(KeyEvent.class)));
+            }
+        });
+    }
 }

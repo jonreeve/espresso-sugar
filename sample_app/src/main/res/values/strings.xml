@@ -4,5 +4,6 @@
     <string name="app_name">SugarSample</string>
     <string name="hello_world">Hello world!</string>
     <string name="button1_text">Button 1</string>
+    <string name="test">test</string>
 
 </resources>
