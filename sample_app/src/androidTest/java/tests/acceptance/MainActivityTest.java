@@ -1,18 +1,26 @@
 package tests.acceptance;
 
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
+import android.view.DragEvent;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.View;
 import com.espresso.sugar.ActivityTest;
 import com.espresso.sugar.sample.MainActivity;
 import com.espresso.sugar.sample.R;
 import com.espresso.sugar.sample.UiInteractionListener;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.Sequence;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static com.espresso.sugar.EspressoSugar.*;
@@ -30,7 +38,13 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
     @Before
     public void setUp() throws Exception {
         final MainActivity activity = getActivity();
-        activity.setInteractionListener(uiInteractionListener);
+//        activity.setInteractionListener(uiInteractionListener);
+        activity.setInteractionListener(new LoggingUiInteractionListener(uiInteractionListener));
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        mockery.assertIsSatisfied();
     }
 
     @Test
@@ -44,32 +58,43 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
 
         // Sugared
         clickView(withText(R.string.button1_text));
-
-        mockery.assertIsSatisfied();
     }
 
     @Test
     public void canTypeIntoAView() {
-        expectTypingTest();
+        expectTypingTestIntoView(withId(R.id.editText1));
 
         // Espresso
         // onView(withId(R.id.editText1)).perform(type("test"));
 
         // Sugared
         type("test").intoView(withId(R.id.editText1));
-
-        mockery.assertIsSatisfied();
     }
 
     @Test
     public void canTypeResourceStringIntoAView() {
-        expectTypingTest();
+        expectTypingTestIntoView(withId(R.id.editText1));
 
         type(R.string.test).intoView(withId(R.id.editText1));
     }
 
+    @Test
+    public void canPressAndHoldThenDrop() {
+        mockery.checking(new Expectations(){{
+            final Sequence drag = mockery.sequence("drag");
 
-//        type(R.string.app_name).intoView(withId(R.id.editText1));
+            oneOf(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_DOWN)));
+            will(returnValue(Boolean.TRUE));
+            inSequence(drag);
+
+            oneOf(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_UP)));
+            will(returnValue(Boolean.TRUE));
+            inSequence(drag);
+        }});
+
+        pressAndHoldView(withId(R.id.draggable)).andDrop();
+    }
+
 //        scrollToView(withId(R.id.image));
 //
 //        pressAndHoldView(withId(R.id.image)).andDrop();
@@ -117,7 +142,7 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
 //        pressAndHoldView(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andHold(); // Terminate in the same way the animation framework does? Then drop or error? Configurable?
 //        pressAndHoldView(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andHold().untilIt(); // "It" should be the view you're dragging, always - consistent, simple, other one not always present
 
-    private void expectTypingTest() {
+    private void expectTypingTestIntoView(final Matcher<View> viewMatcher) {
         mockery.checking(new Expectations() {
             {
                 keyPress(KeyEvent.KEYCODE_T);
@@ -127,9 +152,70 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
             }
 
             private void keyPress(int keycode) {
-                oneOf(uiInteractionListener).onKey(with(withId(R.id.editText1)), with(keycode), with(any(KeyEvent.class)));
-                oneOf(uiInteractionListener).onKey(with(withId(R.id.editText1)), with(keycode), with(any(KeyEvent.class)));
+                oneOf(uiInteractionListener).onKey(with(viewMatcher), with(keycode), with(aKeyEventWith(KeyEvent.ACTION_DOWN)));
+                oneOf(uiInteractionListener).onKey(with(viewMatcher), with(keycode), with(aKeyEventWith(KeyEvent.ACTION_UP)));
             }
         });
+    }
+
+    private Matcher<MotionEvent> aMotionEventWith(final int action) {
+        return new TypeSafeMatcher<MotionEvent>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("a MotionEvent with action " + MotionEvent.actionToString(action));
+            }
+
+            @Override
+            public boolean matchesSafely(MotionEvent motionEvent) {
+                return motionEvent.getAction() == action;
+            }
+        };
+    }
+
+    private Matcher<KeyEvent> aKeyEventWith(final int action) {
+        return new TypeSafeMatcher<KeyEvent>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("a KeyEvent with action " + MotionEvent.actionToString(action));
+            }
+
+            @Override
+            public boolean matchesSafely(KeyEvent keyEvent) {
+                return keyEvent.getAction() == action;
+            }
+        };
+    }
+
+    private static class LoggingUiInteractionListener implements UiInteractionListener {
+        public static final String LOG_TAG = "UI-Interaction";
+        private final UiInteractionListener delegate;
+
+        public LoggingUiInteractionListener(UiInteractionListener delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.d(LOG_TAG, "onClick " + v);
+            delegate.onClick(v);
+        }
+
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            Log.d(LOG_TAG, "onDrag " + v + ", " + event);
+            return delegate.onDrag(v, event);
+        }
+
+        @Override
+        public boolean onKey(View v, int keyCode, KeyEvent event) {
+            Log.d(LOG_TAG, "onKey " + v + ", " + keyCode + ", " + event);
+            return delegate.onKey(v, keyCode, event);
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            Log.d(LOG_TAG, "onTouch " + v + ", " + event);
+            return delegate.onTouch(v, event);
+        }
     }
 }

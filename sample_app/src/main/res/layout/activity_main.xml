@@ -17,4 +17,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/editText1"
             />
+    <View
+            android:id="@+id/draggable"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="#f00"/>
 </LinearLayout>

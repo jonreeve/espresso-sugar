@@ -20,6 +20,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         setContentView(R.layout.activity_main);
         findViewById(R.id.button1).setOnClickListener(this);
         findViewById(R.id.editText1).setOnKeyListener(this);
+        findViewById(R.id.draggable).setOnTouchListener(this);
     }
 
     @Override

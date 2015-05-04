@@ -83,7 +83,6 @@ public class PressAndHoldAction {
 
 
     public PressAndHoldAction then() {
-        // TODO implement com.wasabicode.test.espresso.sugar.PressAndHoldAction#then
         return this;
     }
 
