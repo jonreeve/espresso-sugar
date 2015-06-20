@@ -7,6 +7,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import com.espresso.sugar.ActivityTest;
+import com.espresso.sugar.WaitCondition;
 import com.espresso.sugar.sample.MainActivity;
 import com.espresso.sugar.sample.R;
 import com.espresso.sugar.sample.UiInteractionListener;
@@ -16,20 +17,24 @@ import org.hamcrest.TypeSafeMatcher;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.Sequence;
+import org.jmock.States;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import java.util.concurrent.Executors;
+
+import static android.support.test.espresso.matcher.ViewMatchers.*;
 import static com.espresso.sugar.EspressoSugar.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 @RunWith(AndroidJUnit4.class)
 public class MainActivityTest extends ActivityTest<MainActivity> {
     private Mockery mockery = new Mockery();
 
     private UiInteractionListener uiInteractionListener = mockery.mock(UiInteractionListener.class);
+    private FakeWaitCondition fakeCondition = mockery.mock(FakeWaitCondition.class);
 
     public MainActivityTest() {
         super(MainActivity.class);
@@ -103,6 +108,47 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
         }});
 
         pressAndHoldView(withId(R.id.draggable)).andDrop();
+    }
+
+    @Test
+    public void canHoldViewUntilConditionIsSatisfied() throws InterruptedException {
+        mockery.checking(new Expectations() {{
+            allowing(uiInteractionListener).onTouch(with(withId(any(Integer.class))), with(aMotionEventWith(MotionEvent.ACTION_CANCEL)));
+            will(returnValue(true));
+
+            final States conditionState = mockery.states("conditionState").startsAs("waiting");
+
+            atLeast(1).of(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_DOWN)));
+            will(returnValue(Boolean.TRUE));
+            when(conditionState.is("waiting"));
+
+            oneOf(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_UP)));
+            will(returnValue(Boolean.TRUE));
+            when(conditionState.is("satisfied"));
+
+            allowing(fakeCondition).getDescription();
+            will(returnValue("Fake wait condition"));
+
+            allowing(fakeCondition).isSatisfied();
+            will(returnValue(Boolean.FALSE));
+            when(conditionState.isNot("satisfied"));
+
+            allowing(fakeCondition).isSatisfied();
+            will(returnValue(Boolean.TRUE));
+            when(conditionState.is("satisfied"));
+
+            oneOf(fakeCondition).satisfy();
+            then(conditionState.is("satisfied"));
+        }});
+
+        Executors.newSingleThreadScheduledExecutor().schedule(new Runnable() {
+            @Override
+            public void run() {
+                fakeCondition.satisfy();
+            }
+        }, 2, SECONDS);
+
+        pressAndHoldView(withId(R.id.draggable)).until(fakeCondition).andDrop();
     }
 
 //        WaitCondition condition = new WaitCondition() {
@@ -227,5 +273,27 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
             Log.d(LOG_TAG, "onTouch " + v + ", " + event);
             return delegate.onTouch(v, event);
         }
+    }
+
+    private static class StubWaitCondition implements WaitCondition {
+        volatile boolean satisfied = false;
+
+        @Override
+        public boolean isSatisfied() {
+            return satisfied;
+        }
+
+        @Override
+        public String getDescription() {
+            return "Stub Condition";
+        }
+
+        public void satisfy() {
+            this.satisfied = true;
+        }
+    }
+
+    private static interface FakeWaitCondition extends WaitCondition {
+        public void satisfy();
     }
 }
