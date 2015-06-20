@@ -79,6 +79,16 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
     }
 
     @Test
+    public void canScrollToView() {
+        final int halfArea = 50;
+        final View viewWeScrollTo = getActivity().findViewById(R.id.needs_scrolling_to);
+
+        scrollToView(withId(R.id.needs_scrolling_to));
+
+        assertThat(viewWeScrollTo, isDisplayingAtLeast(halfArea));
+    }
+
+    @Test
     public void canPressAndHoldThenDrop() {
         mockery.checking(new Expectations(){{
             final Sequence drag = mockery.sequence("drag");
@@ -95,9 +105,6 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
         pressAndHoldView(withId(R.id.draggable)).andDrop();
     }
 
-//        scrollToView(withId(R.id.image));
-//
-//        pressAndHoldView(withId(R.id.image)).andDrop();
 //        WaitCondition condition = new WaitCondition() {
 //            @Override
 //            public boolean isSatisfied() {
@@ -153,7 +160,10 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
 
             private void keyPress(int keycode) {
                 oneOf(uiInteractionListener).onKey(with(viewMatcher), with(keycode), with(aKeyEventWith(KeyEvent.ACTION_DOWN)));
+                will(returnValue(true));
+
                 oneOf(uiInteractionListener).onKey(with(viewMatcher), with(keycode), with(aKeyEventWith(KeyEvent.ACTION_UP)));
+                will(returnValue(true));
             }
         });
     }
