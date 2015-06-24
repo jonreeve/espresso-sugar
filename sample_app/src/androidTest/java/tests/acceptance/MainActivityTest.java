@@ -17,7 +17,6 @@ import org.hamcrest.TypeSafeMatcher;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.Sequence;
-import org.jmock.States;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,13 +27,14 @@ import java.util.concurrent.Executors;
 import static android.support.test.espresso.matcher.ViewMatchers.*;
 import static com.espresso.sugar.EspressoSugar.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class MainActivityTest extends ActivityTest<MainActivity> {
     private Mockery mockery = new Mockery();
 
     private UiInteractionListener uiInteractionListener = mockery.mock(UiInteractionListener.class);
-    private FakeWaitCondition fakeCondition = mockery.mock(FakeWaitCondition.class);
+    private FakeWaitCondition fakeCondition = new FakeWaitCondition();
 
     public MainActivityTest() {
         super(MainActivity.class);
@@ -116,29 +116,11 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
             allowing(uiInteractionListener).onTouch(with(withId(any(Integer.class))), with(aMotionEventWith(MotionEvent.ACTION_CANCEL)));
             will(returnValue(true));
 
-            final States conditionState = mockery.states("conditionState").startsAs("waiting");
-
             atLeast(1).of(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_DOWN)));
             will(returnValue(Boolean.TRUE));
-            when(conditionState.is("waiting"));
 
             oneOf(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_UP)));
             will(returnValue(Boolean.TRUE));
-            when(conditionState.is("satisfied"));
-
-            allowing(fakeCondition).getDescription();
-            will(returnValue("Fake wait condition"));
-
-            allowing(fakeCondition).isSatisfied();
-            will(returnValue(Boolean.FALSE));
-            when(conditionState.isNot("satisfied"));
-
-            allowing(fakeCondition).isSatisfied();
-            will(returnValue(Boolean.TRUE));
-            when(conditionState.is("satisfied"));
-
-            oneOf(fakeCondition).satisfy();
-            then(conditionState.is("satisfied"));
         }});
 
         Executors.newSingleThreadScheduledExecutor().schedule(new Runnable() {
@@ -149,6 +131,8 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
         }, 2, SECONDS);
 
         pressAndHoldView(withId(R.id.draggable)).until(fakeCondition).andDrop();
+
+        assertTrue("Condition should have been satisfied before test could proceed and finish.", fakeCondition.isSatisfied());
     }
 
 //        WaitCondition condition = new WaitCondition() {
@@ -275,7 +259,7 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
         }
     }
 
-    private static class StubWaitCondition implements WaitCondition {
+    private static class FakeWaitCondition implements WaitCondition {
         volatile boolean satisfied = false;
 
         @Override
@@ -291,9 +275,5 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
         public void satisfy() {
             this.satisfied = true;
         }
-    }
-
-    private static interface FakeWaitCondition extends WaitCondition {
-        public void satisfy();
     }
 }
