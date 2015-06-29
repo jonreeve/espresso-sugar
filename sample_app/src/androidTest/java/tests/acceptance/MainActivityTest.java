@@ -7,6 +7,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import com.espresso.sugar.ActivityTest;
+import com.espresso.sugar.ViewWaitCondition;
 import com.espresso.sugar.WaitCondition;
 import com.espresso.sugar.sample.MainActivity;
 import com.espresso.sugar.sample.R;
@@ -34,7 +35,6 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
     private Mockery mockery = new Mockery();
 
     private UiInteractionListener uiInteractionListener = mockery.mock(UiInteractionListener.class);
-    private FakeWaitCondition fakeCondition = new FakeWaitCondition();
 
     public MainActivityTest() {
         super(MainActivity.class);
@@ -95,7 +95,7 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
 
     @Test
     public void canPressAndHoldThenDrop() {
-        mockery.checking(new Expectations(){{
+        mockery.checking(new Expectations() {{
             final Sequence drag = mockery.sequence("drag");
 
             oneOf(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_DOWN)));
@@ -116,12 +116,14 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
             allowing(uiInteractionListener).onTouch(with(withId(any(Integer.class))), with(aMotionEventWith(MotionEvent.ACTION_CANCEL)));
             will(returnValue(true));
 
-            atLeast(1).of(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_DOWN)));
+            oneOf(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_DOWN)));
             will(returnValue(Boolean.TRUE));
 
             oneOf(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_UP)));
             will(returnValue(Boolean.TRUE));
         }});
+
+        final FakeWaitCondition fakeCondition = new FakeWaitCondition();
 
         Executors.newSingleThreadScheduledExecutor().schedule(new Runnable() {
             @Override
@@ -135,17 +137,33 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
         assertTrue("Condition should have been satisfied before test could proceed and finish.", fakeCondition.isSatisfied());
     }
 
-//        WaitCondition condition = new WaitCondition() {
-//            @Override
-//            public boolean isSatisfied() {
-//                return true;
-//            }
-//
-//            @Override
-//            public String getDescription() {
-//                return "(true)";
-//            }
-//        };
+    @Test
+    public void canHoldViewUntilConditionOnThatViewIsSatisfied() throws InterruptedException {
+        mockery.checking(new Expectations() {{
+            allowing(uiInteractionListener).onTouch(with(withId(any(Integer.class))), with(aMotionEventWith(MotionEvent.ACTION_CANCEL)));
+            will(returnValue(true));
+
+            oneOf(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_DOWN)));
+            will(returnValue(Boolean.TRUE));
+
+            oneOf(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_UP)));
+            will(returnValue(Boolean.TRUE));
+        }});
+
+        final FakeViewWaitCondition fakeViewCondition = new FakeViewWaitCondition();
+
+        Executors.newSingleThreadScheduledExecutor().schedule(new Runnable() {
+            @Override
+            public void run() {
+                fakeViewCondition.satisfy();
+            }
+        }, 2, SECONDS);
+
+        pressAndHoldView(withId(R.id.draggable)).untilIt(fakeViewCondition).andDrop();
+
+        assertTrue("Condition should have been satisfied before test could proceed and finish.", fakeViewCondition.isSatisfied(null));
+    }
+
 //        ViewWaitCondition viewCondition = new ViewWaitCondition() {
 //            @Override
 //            public boolean isSatisfied(View view) {
@@ -269,7 +287,25 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
 
         @Override
         public String getDescription() {
-            return "Stub Condition";
+            return "Fake Condition";
+        }
+
+        public void satisfy() {
+            this.satisfied = true;
+        }
+    }
+
+    private static class FakeViewWaitCondition implements ViewWaitCondition {
+        volatile boolean satisfied = false;
+
+        @Override
+        public boolean isSatisfied(final View view) {
+            return satisfied;
+        }
+
+        @Override
+        public String getDescription(final Matcher<View> viewMatcher) {
+            return "Fake View Condition";
         }
 
         public void satisfy() {
