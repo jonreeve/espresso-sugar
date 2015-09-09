@@ -1,4 +1,4 @@
-package com.espresso.sugar.sample;
+package com.wasabicode.espressosugar.sample;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -6,7 +6,6 @@ import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
 
 /**
  * Sample activity that passes all interaction onto a listener so we can spy and verify on that in tests.

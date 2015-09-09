@@ -1,4 +1,4 @@
-package com.espresso.sugar;
+package com.wasabicode.espressosugar;
 
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
@@ -12,28 +12,28 @@ import javax.annotation.Nonnull;
 
 import static org.hamcrest.Matchers.anything;
 
-public class PressAndHoldAction {
+public class PressAndHoldContinuation {
     @Nonnull private final DragContext dragContext;
     @Nonnull private PrecisionDescriber precisionDescriber = Press.FINGER;
     @Nonnull private CoordinatesProvider coordinatesProvider = GeneralLocation.CENTER;
 
-    public static PressAndHoldAction pressAndHoldView(@Nonnull Matcher<View> viewMatcher) {
-        return new PressAndHoldAction(viewMatcher).perform();
+    public static PressAndHoldContinuation pressAndHoldView(@Nonnull Matcher<View> viewMatcher) {
+        return new PressAndHoldContinuation(viewMatcher).perform();
     }
 
-    public static PressAndHoldAction pressAndHoldView(@Nonnull final DragContext dragContext) {
-        return new PressAndHoldAction(dragContext).perform();
+    public static PressAndHoldContinuation pressAndHoldView(@Nonnull final DragContext dragContext) {
+        return new PressAndHoldContinuation(dragContext).perform();
     }
 
-    private PressAndHoldAction(@Nonnull Matcher<View> viewMatcher) {
+    private PressAndHoldContinuation(@Nonnull Matcher<View> viewMatcher) {
         this(new DragContext(viewMatcher));
     }
 
-    private PressAndHoldAction(@Nonnull final DragContext dragContext) {
+    private PressAndHoldContinuation(@Nonnull final DragContext dragContext) {
         this.dragContext = dragContext;
     }
 
-    public PressAndHoldAction until(@Nonnull final WaitCondition condition) {
+    public PressAndHoldContinuation until(@Nonnull final WaitCondition condition) {
         dragContext.perform(new ViewAction() {
             @Override
             public Matcher<View> getConstraints() {
@@ -55,7 +55,7 @@ public class PressAndHoldAction {
         return this;
     }
 
-    public PressAndHoldAction untilView(@Nonnull final Matcher<View> viewMatcher, @Nonnull final ViewWaitCondition condition) {
+    public PressAndHoldContinuation untilView(@Nonnull final Matcher<View> viewMatcher, @Nonnull final ViewWaitCondition condition) {
         dragContext.perform(viewMatcher, new ViewAction() {
             @Override
             public Matcher<View> getConstraints() {
@@ -77,12 +77,12 @@ public class PressAndHoldAction {
         return this;
     }
 
-    public PressAndHoldAction untilIt(@Nonnull final ViewWaitCondition condition) {
+    public PressAndHoldContinuation untilIt(@Nonnull final ViewWaitCondition condition) {
         return untilView(dragContext.getViewMatcher(), condition);
     }
 
 
-    public PressAndHoldAction then() {
+    public PressAndHoldContinuation then() {
         return this;
     }
 
@@ -91,10 +91,10 @@ public class PressAndHoldAction {
     }
 
     public void andDrop() {
-        new DropAction(dragContext);
+        new DropContinuation(dragContext);
     }
 
-    private PressAndHoldAction perform() {
+    private PressAndHoldContinuation perform() {
         dragContext.perform(new ViewAction() {
             @Override
             public Matcher<View> getConstraints() {

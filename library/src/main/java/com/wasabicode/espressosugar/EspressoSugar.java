@@ -13,43 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.espresso.sugar;
+package com.wasabicode.espressosugar;
 
 import android.support.annotation.StringRes;
 import android.support.test.espresso.Espresso;
+import android.support.test.espresso.action.ViewActions;
 import android.view.View;
 import org.hamcrest.Matcher;
 
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static org.hamcrest.Matchers.allOf;
 
 /**
  * Espresso tests still don't read nicely enough (i.e. as proper sentences). These functions add syntactic sugar.
  */
 public class EspressoSugar {
-    public static void clickView(Matcher<View> viewMatcher) {
-        Espresso.onView(viewMatcher).perform(click());
+    public static void clickOn(Matcher<View> viewMatcher) {
+        Espresso.onView(viewMatcher).perform(ViewActions.click());
     }
 
-    public static void clickView(Matcher<View>... viewMatchers) {
-        clickView(allOf(viewMatchers));
+    public static void clickOn(Matcher<View>... viewMatchers) {
+        clickOn(allOf(viewMatchers));
     }
 
-    public static TypeAction type(String textToBeTyped) {
-        return new TypeAction(textToBeTyped);
+    public static TypeContinuation type(String textToBeTyped) {
+        return new TypeContinuation(textToBeTyped);
     }
 
-    public static TypeResourceStringAction type(@StringRes int textToBeTypedId) {
-        return new TypeResourceStringAction(textToBeTypedId);
+    public static TypeResourceStringContinuation type(@StringRes int textToBeTypedId) {
+        return new TypeResourceStringContinuation(textToBeTypedId);
     }
 
-    public static void scrollToView(Matcher<View> viewMatcher) {
-        Espresso.onView(viewMatcher).perform(scrollTo());
+    public static void scrollTo(Matcher<View> viewMatcher) {
+        Espresso.onView(viewMatcher).perform(ViewActions.scrollTo());
     }
 
-    public static PressAndHoldAction pressAndHoldView(Matcher<View> viewMatcher) {
-        return PressAndHoldAction.pressAndHoldView(viewMatcher);
+    public static PressAndHoldContinuation pressAndHold(Matcher<View> viewMatcher) {
+        return PressAndHoldContinuation.pressAndHoldView(viewMatcher);
+    }
+
+    public static Matcher<View> view(Matcher<View> viewMatcher) {
+        return viewMatcher;
     }
 
 //    public static ViewInteraction onView(Matcher<View>... viewMatchers) {

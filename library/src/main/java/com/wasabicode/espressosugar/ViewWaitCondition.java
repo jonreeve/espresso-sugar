@@ -1,4 +1,4 @@
-package com.espresso.sugar;
+package com.wasabicode.espressosugar;
 
 import android.view.View;
 import org.hamcrest.Matcher;

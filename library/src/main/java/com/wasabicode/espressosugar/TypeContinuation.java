@@ -1,4 +1,4 @@
-package com.espresso.sugar;
+package com.wasabicode.espressosugar;
 
 import android.support.test.espresso.Espresso;
 import android.view.View;
@@ -8,14 +8,15 @@ import javax.annotation.Nonnull;
 
 import static android.support.test.espresso.action.ViewActions.typeText;
 
-public class TypeAction {
+public class TypeContinuation {
     @Nonnull private final String textToBeTyped;
 
-    public TypeAction(@Nonnull String textToBeTyped) {
+    public TypeContinuation(@Nonnull String textToBeTyped) {
         this.textToBeTyped = textToBeTyped;
     }
 
-    public void intoView(Matcher<View> viewMatcher) {
+    public TypeCompleteContinuation into(@Nonnull final Matcher<View> viewMatcher) {
         Espresso.onView(viewMatcher).perform(typeText(textToBeTyped));
+        return new TypeCompleteContinuation(viewMatcher);
     }
 }

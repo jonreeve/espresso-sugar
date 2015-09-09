@@ -1,4 +1,4 @@
-package com.espresso.sugar;
+package com.wasabicode.espressosugar;
 
 import android.support.annotation.StringRes;
 import android.support.test.espresso.Espresso;
@@ -10,16 +10,16 @@ import org.hamcrest.Matcher;
 
 import javax.annotation.Nonnull;
 
-public class TypeResourceStringAction {
+public class TypeResourceStringContinuation {
     private final int textToBeTypedId;
 
-    public TypeResourceStringAction(@StringRes int textToBeTypedId) {
-
+    public TypeResourceStringContinuation(@StringRes int textToBeTypedId) {
         this.textToBeTypedId = textToBeTypedId;
     }
 
-    public void intoView(Matcher<View> viewMatcher) {
+    public TypeCompleteContinuation into(@Nonnull final Matcher<View> viewMatcher) {
         Espresso.onView(viewMatcher).perform(new TypeResourceTextAction());
+        return new TypeCompleteContinuation(viewMatcher);
     }
 
     private class TypeResourceTextAction implements ViewAction {

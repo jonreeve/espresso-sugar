@@ -1,4 +1,4 @@
-package com.espresso.sugar;
+package com.wasabicode.espressosugar;
 
 import android.support.test.espresso.*;
 import android.support.test.espresso.action.*;
@@ -8,13 +8,13 @@ import org.hamcrest.Matcher;
 
 import javax.annotation.Nonnull;
 
-public class DragOverViewAction {
+public class DragOverViewContinuation {
     @Nonnull private final Matcher<View> viewMatcher;
     @Nonnull private final DragContext dragContext;
     @Nonnull private PrecisionDescriber precisionDescriber = Press.FINGER;
     @Nonnull private CoordinatesProvider coordinatesProvider = GeneralLocation.CENTER;
 
-    public DragOverViewAction(@Nonnull final Matcher<View> viewMatcher, @Nonnull final DragContext dragContext) {
+    public DragOverViewContinuation(@Nonnull final Matcher<View> viewMatcher, @Nonnull final DragContext dragContext) {
         this.viewMatcher = viewMatcher;
         this.dragContext = dragContext;
 
@@ -42,7 +42,17 @@ public class DragOverViewAction {
         });
     }
 
-    public void andDrop() {
-        new DropAction(dragContext);
+    public DragOverViewContinuation with(@Nonnull final PrecisionDescriber precisionDescriber) {
+        this.precisionDescriber = precisionDescriber;
+        return this;
+    }
+
+    public DragOverViewContinuation in(@Nonnull final CoordinatesProvider coordinatesProvider) {
+        this.coordinatesProvider = coordinatesProvider;
+        return this;
+    }
+
+    public DropContinuation andDrop() {
+        return new DropContinuation(dragContext);
     }
 }

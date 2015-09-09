@@ -7,11 +7,11 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import com.espresso.sugar.ActivityTest;
-import com.espresso.sugar.ViewWaitCondition;
-import com.espresso.sugar.WaitCondition;
-import com.espresso.sugar.sample.MainActivity;
-import com.espresso.sugar.sample.R;
-import com.espresso.sugar.sample.UiInteractionListener;
+import com.wasabicode.espressosugar.ViewWaitCondition;
+import com.wasabicode.espressosugar.WaitCondition;
+import com.wasabicode.espressosugar.sample.MainActivity;
+import com.wasabicode.espressosugar.sample.R;
+import com.wasabicode.espressosugar.sample.UiInteractionListener;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -26,7 +26,7 @@ import org.junit.runner.RunWith;
 import java.util.concurrent.Executors;
 
 import static android.support.test.espresso.matcher.ViewMatchers.*;
-import static com.espresso.sugar.EspressoSugar.*;
+import static com.wasabicode.espressosugar.EspressoSugar.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertTrue;
 
@@ -62,7 +62,7 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
         // onView(withText(R.string.button1)).perform(click());
 
         // Sugared
-        clickView(withText(R.string.button1_text));
+        clickOn(view(withText(R.string.button1_text)));
     }
 
     @Test
@@ -73,14 +73,14 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
         // onView(withId(R.id.editText1)).perform(type("test"));
 
         // Sugared
-        type("test").intoView(withId(R.id.editText1));
+        type("test").into(view(withId(R.id.editText1)));
     }
 
     @Test
     public void canTypeResourceStringIntoAView() {
         expectTypingTestIntoView(withId(R.id.editText1));
 
-        type(R.string.test).intoView(withId(R.id.editText1));
+        type(R.string.test).into(view(withId(R.id.editText1)));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
         final int halfArea = 50;
         final View viewWeScrollTo = getActivity().findViewById(R.id.needs_scrolling_to);
 
-        scrollToView(withId(R.id.needs_scrolling_to));
+        scrollTo(view(withId(R.id.needs_scrolling_to)));
 
         assertThat(viewWeScrollTo, isDisplayingAtLeast(halfArea));
     }
@@ -98,28 +98,28 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
         mockery.checking(new Expectations() {{
             final Sequence drag = mockery.sequence("drag");
 
-            oneOf(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_DOWN)));
+            oneOf(uiInteractionListener).onTouch(with(view(withId(R.id.draggable))), with(aMotionEventWith(MotionEvent.ACTION_DOWN)));
             will(returnValue(Boolean.TRUE));
             inSequence(drag);
 
-            oneOf(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_UP)));
+            oneOf(uiInteractionListener).onTouch(with(view(withId(R.id.draggable))), with(aMotionEventWith(MotionEvent.ACTION_UP)));
             will(returnValue(Boolean.TRUE));
             inSequence(drag);
         }});
 
-        pressAndHoldView(withId(R.id.draggable)).andDrop();
+        pressAndHold(view(withId(R.id.draggable))).andDrop();
     }
 
     @Test
     public void canHoldViewUntilConditionIsSatisfied() throws InterruptedException {
         mockery.checking(new Expectations() {{
-            allowing(uiInteractionListener).onTouch(with(withId(any(Integer.class))), with(aMotionEventWith(MotionEvent.ACTION_CANCEL)));
+            allowing(uiInteractionListener).onTouch(with(view(withId(any(Integer.class)))), with(aMotionEventWith(MotionEvent.ACTION_CANCEL)));
             will(returnValue(true));
 
-            oneOf(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_DOWN)));
+            oneOf(uiInteractionListener).onTouch(with(view(withId(R.id.draggable))), with(aMotionEventWith(MotionEvent.ACTION_DOWN)));
             will(returnValue(Boolean.TRUE));
 
-            oneOf(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_UP)));
+            oneOf(uiInteractionListener).onTouch(with(view(withId(R.id.draggable))), with(aMotionEventWith(MotionEvent.ACTION_UP)));
             will(returnValue(Boolean.TRUE));
         }});
 
@@ -132,7 +132,7 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
             }
         }, 2, SECONDS);
 
-        pressAndHoldView(withId(R.id.draggable)).until(fakeCondition).andDrop();
+        pressAndHold(view(withId(R.id.draggable))).until(fakeCondition).andDrop();
 
         assertTrue("Condition should have been satisfied before test could proceed and finish.", fakeCondition.isSatisfied());
     }
@@ -140,13 +140,13 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
     @Test
     public void canHoldViewUntilConditionOnThatViewIsSatisfied() throws InterruptedException {
         mockery.checking(new Expectations() {{
-            allowing(uiInteractionListener).onTouch(with(withId(any(Integer.class))), with(aMotionEventWith(MotionEvent.ACTION_CANCEL)));
+            allowing(uiInteractionListener).onTouch(with(view(withId(any(Integer.class)))), with(aMotionEventWith(MotionEvent.ACTION_CANCEL)));
             will(returnValue(true));
 
-            oneOf(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_DOWN)));
+            oneOf(uiInteractionListener).onTouch(with(view(withId(R.id.draggable))), with(aMotionEventWith(MotionEvent.ACTION_DOWN)));
             will(returnValue(Boolean.TRUE));
 
-            oneOf(uiInteractionListener).onTouch(with(withId(R.id.draggable)), with(aMotionEventWith(MotionEvent.ACTION_UP)));
+            oneOf(uiInteractionListener).onTouch(with(view(withId(R.id.draggable))), with(aMotionEventWith(MotionEvent.ACTION_UP)));
             will(returnValue(Boolean.TRUE));
         }});
 
@@ -159,7 +159,7 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
             }
         }, 2, SECONDS);
 
-        pressAndHoldView(withId(R.id.draggable)).untilIt(fakeViewCondition).andDrop();
+        pressAndHold(view(withId(R.id.draggable))).untilIt(fakeViewCondition).andDrop();
 
         assertTrue("Condition should have been satisfied before test could proceed and finish.", fakeViewCondition.isSatisfied(null));
     }
@@ -175,10 +175,10 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
 //                return "is visible";
 //            }
 //        };
-//        pressAndHoldView(withId(R.id.image)).until(condition).then().drag();
-//        pressAndHoldView(withId(R.id.image)).untilIt(viewCondition).then().drag();
-//        pressAndHoldView(withId(R.id.image)).untilView(withId(R.id.image), viewCondition).then().drag();
-//        pressAndHoldView(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andDrop();
+//        pressAndHold(withId(R.id.image)).until(condition).then().drag();
+//        pressAndHold(withId(R.id.image)).untilIt(viewCondition).then().drag();
+//        pressAndHold(withId(R.id.image)).untilView(withId(R.id.image), viewCondition).then().drag();
+//        pressAndHold(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andDrop();
 
 //        View v;
 //        v.animate().alpha();
@@ -188,14 +188,14 @@ public class MainActivityTest extends ActivityTest<MainActivity> {
 
 // Later
 //        dragView(withId(R.id.image)).overView(withId(R.id.image)).andDrop();
-//        pressAndHoldView(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andDrop();
-//        pressAndHoldView(withId(R.id.image)).thenAfter(10, SECONDS).drag()...;
-//        pressAndHoldView(withId(R.id.image)).until(XXX).then().drag()...;
-//        pressAndHoldView(withId(R.id.image)).until(XXX).thenAfter(10, SECONDS).drag()...;
-//        pressAndHoldView(withId(R.id.image)).untilIt(turnsGreen()).thenAfter(10, SECONDS).drag()...;
-//        pressAndHoldView(withId(R.id.image)).untilView(withText("Test"), turnsGreen()).thenAfter(10, SECONDS).drag()...;
-//        pressAndHoldView(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andHold(); // Terminate in the same way the animation framework does? Then drop or error? Configurable?
-//        pressAndHoldView(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andHold().untilIt(); // "It" should be the view you're dragging, always - consistent, simple, other one not always present
+//        pressAndHold(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andDrop();
+//        pressAndHold(withId(R.id.image)).thenAfter(10, SECONDS).drag()...;
+//        pressAndHold(withId(R.id.image)).until(XXX).then().drag()...;
+//        pressAndHold(withId(R.id.image)).until(XXX).thenAfter(10, SECONDS).drag()...;
+//        pressAndHold(withId(R.id.image)).untilIt(turnsGreen()).thenAfter(10, SECONDS).drag()...;
+//        pressAndHold(withId(R.id.image)).untilView(withText("Test"), turnsGreen()).thenAfter(10, SECONDS).drag()...;
+//        pressAndHold(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andHold(); // Terminate in the same way the animation framework does? Then drop or error? Configurable?
+//        pressAndHold(withId(R.id.image)).then().drag().overView(withId(R.id.image)).andHold().untilIt(); // "It" should be the view you're dragging, always - consistent, simple, other one not always present
 
     private void expectTypingTestIntoView(final Matcher<View> viewMatcher) {
         mockery.checking(new Expectations() {

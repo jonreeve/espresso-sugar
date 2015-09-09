@@ -1,4 +1,4 @@
-package com.espresso.sugar;
+package com.wasabicode.espressosugar;
 
 import android.view.View;
 import org.hamcrest.Matcher;
@@ -12,7 +12,7 @@ public class DragContinuation {
         this.dragContext = dragContext;
     }
 
-    public DragOverViewAction overView(@Nonnull final Matcher<View> viewMatcher) {
-        return new DragOverViewAction(viewMatcher, dragContext);
+    public DragOverViewContinuation overView(@Nonnull final Matcher<View> viewMatcher) {
+        return new DragOverViewContinuation(viewMatcher, dragContext);
     }
 }

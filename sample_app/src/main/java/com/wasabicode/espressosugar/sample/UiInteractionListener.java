@@ -1,4 +1,4 @@
-package com.espresso.sugar.sample;
+package com.wasabicode.espressosugar.sample;
 
 import android.view.View;
 

@@ -1,4 +1,4 @@
-package com.espresso.sugar;
+package com.wasabicode.espressosugar;
 
 public interface WaitCondition {
     boolean isSatisfied();

@@ -1,4 +1,4 @@
-package com.espresso.sugar;
+package com.wasabicode.espressosugar;
 
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.ViewAction;
@@ -7,8 +7,6 @@ import android.view.View;
 import org.hamcrest.Matcher;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DragContext {
     @Nonnull private final Matcher<View> viewMatcher;
