@@ -13,7 +13,7 @@ onView(withText("Help")).perform(click());
 clickView(withText("Help"));
 ```
 
-You don't say "on door perform open", you say "open the door". That's perfectly possible in your tests too. Just add some sugar to your Espresso.
+You don't say "on door perform hold", you say "hold the door". That's perfectly possible in your tests too. Just add some sugar to your Espresso.
 
 ### Why bother?
 
