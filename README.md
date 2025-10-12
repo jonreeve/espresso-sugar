@@ -1,3 +1,9 @@
+# ARCHIVED
+
+This isn't being updated (last update was ~10yrs ago). You should definitely make your tests succinct, readable, fluent even. 
+Maybe do this kind of thing, maybe do a Page-Object-Model (POM). I generally do. But these days I use Compose and thus use 
+the testing utils for that (and wrap those in POMs).
+
 # espresso-sugar
 Some (syntactic) sugar for your (UI-testing) Espresso.
 
